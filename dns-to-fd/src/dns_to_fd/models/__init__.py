@@ -1,3 +1,3 @@
-from dns_to_fd.models.models import Base, Document, User
+from dns_to_fd.models.models import Base, Document, Role, User
 
-__all__ = (Base, User, Document)
+__all__ = (Base, User, Document, Role)

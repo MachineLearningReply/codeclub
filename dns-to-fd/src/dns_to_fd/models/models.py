@@ -30,9 +30,8 @@ naming_convention = {
 
 
 class Role(enum.StrEnum):
-    ADMIN = enum.auto()
-    WRITER = enum.auto()
-    READER = enum.auto()
+    ADMIN = "App.Admin"
+    USER = "App.User"
 
 
 class Base(DeclarativeBase, AsyncAttrs):
@@ -53,22 +52,18 @@ class User(Base):
 
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     role: Mapped[list[Role]] = mapped_column(ARRAY(Enum(Role)), nullable=False)
-    entra_oids: Mapped[list[uuid.UUID]] = mapped_column(
-        ARRAY(postgresql.UUID(as_uuid=True))
-    )
+    object_id: Mapped[uuid.UUID] = mapped_column(postgresql.UUID(as_uuid=True))
 
     documents: Mapped[list[Document]] = relationship(
         "Document", back_populates="user", cascade="all, delete-orphan", lazy="select"
     )
-    __table_args__ = (UniqueConstraint("object_id"), Index("role"))
+    __table_args__ = (UniqueConstraint("object_id"), Index("ix_index_role", "role"))
 
 
 class Document(Base):
     __tablename__ = "documents"
 
-    uploader_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE")
-    )
+    uploader_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     uri: Mapped[str] = mapped_column(Text, nullable=False)
     size: Mapped[float] = mapped_column(Float, nullable=False)
@@ -77,4 +72,4 @@ class Document(Base):
 
     user: Mapped[User] = relationship("User", back_populates="documents")
 
-    __table_args__ = (UniqueConstraint("uri"), Index("uploader_id"))
+    __table_args__ = (UniqueConstraint("uri"), Index("ix_index_uploader_id", "uploader_id"))
