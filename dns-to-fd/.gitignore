@@ -192,3 +192,11 @@ cython_debug/
 
 # zips
 *.zip
+
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
