@@ -8,11 +8,11 @@ We want to create a small application that parses PDFs and stores its content fo
 
 ### System Context
 
-![C4 system context diagram](docs/c4system.png)
+![C4 system context diagram](docs/diagrams/initial/c4system.png)
 
 ### Container
 
-![C4 container diagram](docs/c4container.png)
+![C4 container diagram](docs/diagrams/initial/c4container.png)
 
 
 ## Local Development
@@ -22,4 +22,41 @@ We want to create a small application that parses PDFs and stores its content fo
     - Azurite to simulate Blob Storage
     - PostgresSQL container for Database
 
-2. Making
+2. Using remote deployments for dependencies
+    - Azure Blob Storage
+    - Azure Database for PostgreSQL flexible servers 
+
+## Networking
+
+1. Virtual Network Boundary for the Kubernetes Cluster 
+2. How many subnets do we need? 
+    - Subnet for AKS cluster
+    - Subnet for App Gateway (Ingress)
+
+
+## Remote Deployment
+
+1. All services on Azure with public network access enabled
+   - az aks show
+   - az aks get-credentials
+   - kubectl ...
+2. Deploy the application within pods
+3. Creating Service Endpoints and restricting public network access 
+4. Creating Private Endpoints and restricting traffic to the network 
+
+
+## Deep Dives
+
+1. DNS
+    - primer via `nslookup`
+    - resolution of azure storage and azure postgres flexible servers
+    - 
+
+1. AKS Overview
+   - [L4 load balancer](![aks-with-l4.png](docs/diagrams/aks/aks-with-l4.png))
+      - Backend Pool points to all the worker nodes
+      - Kube Proxy is aware of Frontend IP to Service IP mapping
+      - Service routes to pods
+   - [L7 Ingress](docs/diagrams/aks/aks-with-l7-ingress.png): https://gateway-api.sigs.k8s.io/guides/getting-started/introduction/)
+   - [L7 with App Gateway](![aks-with-l7-appgw.png](docs/diagrams/aks/aks-with-l7-appgw.png))
+2. App Gateway Overview

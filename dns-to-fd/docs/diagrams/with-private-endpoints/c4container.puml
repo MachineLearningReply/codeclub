@@ -1,0 +1,45 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define AzurePuml https://raw.githubusercontent.com/plantuml-stdlib/Azure-PlantUML/release/2-2/dist
+!includeurl AzurePuml/AzureC4Integration.puml
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/Databases/AzureDatabaseForPostgreSQL.puml
+!includeurl AzurePuml/Containers/AzureKubernetesService.puml
+!includeurl AzurePuml/Networking/AzureApplicationGateway.puml
+!includeurl AzurePuml/Containers/AzureContainerApp.puml
+!includeurl AzurePuml/Identity/AzureActiveDirectory.puml
+!includeurl AzurePuml/Storage/AzureBlobStorage.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_WITH_LEGEND()
+AddElementTag("v1.0",  $borderColor="red" )
+AddElementTag("storage", $shape=RoundedBoxShape())
+
+Person(user, "User", "Uploads and retrieves documents")
+
+System_Ext(extapp, "External Application", "Azure-hosted application with a service principal authorized to call the DNStoFD API")
+
+System_Boundary(dnstofd, "DNStoFD"){
+    AzureApplicationGateway(alb, "Azure App Gateway", "Load balancer", "Routes HTTPS traffic to app instances")
+    AzureKubernetesService(app, "DNStoFD API", "Python, Starlette, Uvicorn", "Parses uploaded documents and stores extracted content")
+}
+
+System_Boundary(azstorage, "Azure Storage") {
+    AzureBlobStorage(blob, "Object Store", "Blob Container", "Stores parsed document blobs")
+}
+System_Boundary(dbserver, "Azure Database Servers"){
+    AzureDatabaseForPostgreSQL(database, "Azure Database for PostgreSQL", "Flexible Server", "Stores users, document records, ownership, and document metadata")
+}
+
+System_Boundary(idp, "Azure Entra ID"){
+    AzureActiveDirectory(entra, "Azure Entra ID", "App Registration",  "Issues and validates identity tokens")
+}
+
+Rel(user, alb, "Uploads and retrieves documents via HTTPS")
+Rel(extapp, alb, "Calls document APIs via HTTPS")
+Rel(alb, app, "Routes requests to")
+Rel(app, entra, "Validates bearer tokens using OIDC/JWKS")
+Rel(app, blob, "Stores parsed document content in")
+Rel(app, database, "Stores user and document records in")
+
+@enduml

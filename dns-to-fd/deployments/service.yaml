@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dns-to-fd
+  namespace: dnstofd
+  labels:
+    app.kubernetes.io/name: dns-to-fd
+    app.kubernetes.io/part-of: dns-to-fd
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: dns-to-fd
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

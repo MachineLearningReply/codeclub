@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dnstofd
+  labels:
+    app.kubernetes.io/name: dns-to-fd
+    app.kubernetes.io/part-of: dns-to-fd

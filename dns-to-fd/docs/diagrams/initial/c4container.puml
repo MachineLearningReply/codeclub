@@ -21,7 +21,7 @@ System_Ext(extapp, "External Application", "Azure-hosted application with a serv
 
 System_Boundary(dnstofd, "DNStoFD"){
     AzureApplicationGateway(alb, "Azure App Gateway", "Load balancer", "Routes HTTPS traffic to app instances")
-    Container(app, "DNStoFD API", "Python, Starlette, Uvicorn", "Parses uploaded documents and stores extracted content")
+    AzureKubernetesService(app, "DNStoFD API", "Python, Starlette, Uvicorn", "Parses uploaded documents and stores extracted content")
 }
 
 System_Boundary(azstorage, "Azure Storage") {

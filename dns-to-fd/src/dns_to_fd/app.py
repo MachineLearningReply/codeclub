@@ -1,13 +1,15 @@
-import contextlib
 from collections.abc import AsyncIterator
+import contextlib
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from starlette.applications import Starlette
-from starlette.routing import BaseRoute, Mount
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.routing import BaseRoute, Mount, Route
 
 from dns_to_fd.api.v1.controllers import document_routes, user_routes
-from dns_to_fd.settings import app_settings
 from dns_to_fd.models import Base
+from dns_to_fd.settings import app_settings
 
 
 @contextlib.asynccontextmanager
@@ -20,8 +22,12 @@ async def lifespan(app: Starlette) -> AsyncIterator[None]:
     yield
 
 
+async def healthz(request: Request) -> JSONResponse:
+    return JSONResponse({"status": "ok"})
+
 
 routes: list[BaseRoute] = [
+    Route("/healthz", healthz, methods=["GET"]),
     Mount("/api/v1/", routes=[*user_routes, *document_routes]),
 ]
 

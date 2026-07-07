@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dns-to-fd
+  namespace: dnstofd
+  labels:
+    app.kubernetes.io/name: dns-to-fd
+    app.kubernetes.io/part-of: dns-to-fd
+  annotations:
+    appgw.ingress.kubernetes.io/backend-protocol: http
+    appgw.ingress.kubernetes.io/health-probe-path: /healthz
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399"
+spec:
+  ingressClassName: azure-application-gateway
+  rules:
+    - host: dnstofd.germanywestcentral.cloudapp.azure.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dns-to-fd
+                port:
+                  number: 80
