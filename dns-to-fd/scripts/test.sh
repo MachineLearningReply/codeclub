@@ -29,9 +29,9 @@ curl -sS -X GET "$BASE_URL/api/v1/users/$USER_ID/documents/$DOCUMENT_ID" \
   -H "Authorization: Bearer $TOKEN"
 echo
 
-curl -sS -X DELETE "$BASE_URL/api/v1/users/$USER_ID/documents/$DOCUMENT_ID" \
-  -H "Authorization: Bearer $TOKEN"
-echo
+#curl -sS -X DELETE "$BASE_URL/api/v1/users/$USER_ID/documents/$DOCUMENT_ID" \
+#  -H "Authorization: Bearer $TOKEN"
+#echo
 
 curl -sS -X DELETE "$BASE_URL/api/v1/users/$USER_ID" \
   -H "Authorization: Bearer $TOKEN"

@@ -53,6 +53,7 @@ resource "azurerm_storage_account" "blob_storage" {
   location                 = local.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  public_network_access_enabled = true
 }
 
 resource "azurerm_postgresql_flexible_server" "db_server" {
