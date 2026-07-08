@@ -13,7 +13,7 @@
 !includeurl AzurePuml/Storage/AzureBlobStorage.puml
 
 SHOW_PERSON_OUTLINE()
-LAYOUT_WITH_LEGEND()
+LAYOUT_LEFT_RIGHT()
 AddElementTag("v1.0",  $borderColor="red" )
 
 Person(user, "User", "Uploads and retrieves documents")

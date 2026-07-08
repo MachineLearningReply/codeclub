@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - ".env.azure"
+      - ".env.local"
     ports:
       - "8000:8000"
     depends_on:

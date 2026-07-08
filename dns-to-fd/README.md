@@ -29,6 +29,9 @@ We want to create a small application that parses PDFs and stores its content fo
 ## Networking
 
 1. Virtual Network Boundary for the Kubernetes Cluster
+
+   ![C4 container diagram with Azure networking](docs/diagrams/with-networking/c4container.png)
+
 2. How many subnets do we need?
    - Subnet for AKS cluster
    - Subnet for App Gateway (Ingress)
@@ -41,7 +44,12 @@ We want to create a small application that parses PDFs and stores its content fo
    - kubectl ...
 2. Deploy the application within pods
 3. Creating Service Endpoints and restricting public network access
+
+   ![C4 container diagram with service endpoints](docs/diagrams/with-service-endpoints/c4container.png)
+
 4. Creating Private Endpoints and restricting traffic to the network
+
+   ![C4 container diagram with private endpoints](docs/diagrams/with-private-endpoints/c4container.png)
 
 ## Deep Dives
 
@@ -51,27 +59,35 @@ We want to create a small application that parses PDFs and stores its content fo
 
      .
      └── com
-     └── example.com
-     ├── www.example.com
-     ├── api.example.com
-     └── dev.example.com
-   - Zone: managed slice of that tree, say, example.com with DNS records:
-     example.com        A      93.184.216.34 (IPv4)
-     example.com        AAAA   2001:503:83eb::30 (IPv6)
-     www.example.com    CNAME  example.com
-     api.example.com    A      10.0.1.20
-     example.com        MX     mail.example.com
+         └── example.com
+             ├── www.example.com (CNAME)
+             ├── api.example.com (subdomain)
+             └── dev.example.com (subdomain)
+     - Zone: managed slice of that tree, say, example.com with DNS records:
+           example.com        A      93.184.216.34 (IPv4)
+           example.com        AAAA   2001:503:83eb::30 (IPv6)
+           www.example.com    CNAME  example.com
+           api.example.com    A      10.0.1.20
+           example.com        MX     mail.example.com
    - Nameserver: a server authoritative for the zone (contains records for it)
    - DNS Primer via `nslookup`: from DNS zone of top-level domain to subdomain zones
    - Resolution of azure storage and azure postgres flexible servers
 2. AKS Overview
 
-   - [L4 load balancer](![aks-with-l4.png](docs/diagrams/aks/aks-with-l4.png))
+   - L4 load balancer
+
+     ![AKS with L4 load balancer](docs/diagrams/aks/aks-with-l4.png)
+
      - Backend Pool points to all the worker nodes
      - Kube Proxy is aware of Frontend IP to Service IP mapping
      - Service routes to pods
-   - [L7 Ingress](docs/diagrams/aks/aks-with-l7-ingress.png): https://gateway-api.sigs.k8s.io/guides/getting-started/introduction/)
-   - [L7 with App Gateway](![aks-with-l7-appgw.png](docs/diagrams/aks/aks-with-l7-appgw.png))
+   - L7 Ingress: https://gateway-api.sigs.k8s.io/guides/getting-started/introduction/
+
+     ![AKS with L7 ingress](docs/diagrams/aks/aks-with-l7-ingress.png)
+
+   - L7 with App Gateway
+
+     ![AKS with L7 App Gateway](docs/diagrams/aks/aks-with-l7-appgw.png)
 3. App Gateway Overview
 4. Extending VNet identity via Service Endpoints (without DNS changes): https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview
 5. Containing traffic within a VNet using Private Endpoints (renewed DNS resolution)

@@ -15,9 +15,9 @@ LAYOUT_WITH_LEGEND()
 AddElementTag("v1.0",  $borderColor="red" )
 AddElementTag("storage", $shape=RoundedBoxShape())
 
+Person(user, "User", "Uploads and retrieves documents")
 
 Enterprise_Boundary(ep, "Azure") {
-  Person(user, "User", "Uploads and retrieves documents")
   System_Ext(extapp, "External Application", "Azure-hosted application with a service principal authorized to call the DNStoFD API")
   System(app, "DNStoFD", "Parses uploaded documents and stores extracted content")
   System(storage, "Azure Storage Account", "Stores parsed document blobs")

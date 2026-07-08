@@ -27,11 +27,14 @@ document_repo = DocumentRepository(Document)
 user_repo = UserRepository(User)
 
 
-def make_add_document(parser: Parser, store: ObjectStore) -> Callable[[Request], Awaitable[JSONResponse]]:
+_stores: list[ObjectStore] = []
+
+def make_add_document(parser: Parser) -> Callable[[Request], Awaitable[JSONResponse]]:
     async def add_document(request: Request) -> JSONResponse:
         async with request.form(max_files=1000, max_fields=1000, max_part_size=1024 * 1024) as form_data:
             user_id = request.path_params["user_id"]
-
+            store = create_obj_store()
+            _stores.append(store)
             claims = await get_entra_id_claims(request)
             if Role.USER.value not in claims.roles:
                 raise HTTPException(
@@ -148,11 +151,14 @@ async def get_document(request: Request) -> JSONResponse:
             }
         )
 
-def make_delete_document(object_store: ObjectStore) -> Callable[[Request], Awaitable[Response]]:
+def make_delete_document() -> Callable[[Request], Awaitable[Response]]:
     async def delete_document(request: Request) -> Response:
         async with request.form(max_files=1000, max_fields=1000, max_part_size=1024 * 1024):
             user_id = request.path_params["user_id"]
             document_id = request.path_params["document_id"]
+            object_store = create_obj_store()
+
+            _stores.append(object_store)
 
             claims = await get_entra_id_claims(request)
             if Role.USER.value not in claims.roles:
@@ -175,22 +181,26 @@ def make_delete_document(object_store: ObjectStore) -> Callable[[Request], Await
     return delete_document
 
 parser = PDFParser()
-object_store = AzureBlobStorage(
-    config={
-        "connection_string": app_settings.blob_storage_connection_string,
-        "credential": ClientSecretCredential(
-            tenant_id=app_settings.azure_tenant_id,
-            client_id=app_settings.azure_client_id,
-            client_secret=app_settings.azure_client_secret,
-        ),
-    },
-    folder_name="dns-to-fd",
-)
+
+def create_obj_store():
+
+    object_store = AzureBlobStorage(
+        config={
+            "connection_string": app_settings.blob_storage_connection_string,
+            "credential": ClientSecretCredential(
+                tenant_id=app_settings.azure_tenant_id,
+                client_id=app_settings.azure_client_id,
+                client_secret=app_settings.azure_client_secret,
+            ),
+        },
+        folder_name="dns-to-fd",
+    )
+    return object_store
 
 routes = [
     Route(
         "/users/{user_id}/documents/",
-        make_add_document(parser, object_store),
+        make_add_document(parser),
         methods=("POST",),
     ),
     Route(
@@ -200,7 +210,7 @@ routes = [
     ),
     Route(
         "/users/{user_id}/documents/{document_id}",
-        make_delete_document(object_store),
+        make_delete_document(),
         methods=("DELETE",),
     ),
     # Route(

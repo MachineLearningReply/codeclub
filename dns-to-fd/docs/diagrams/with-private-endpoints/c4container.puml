@@ -6,12 +6,16 @@
 !includeurl AzurePuml/Databases/AzureDatabaseForPostgreSQL.puml
 !includeurl AzurePuml/Containers/AzureKubernetesService.puml
 !includeurl AzurePuml/Networking/AzureApplicationGateway.puml
+!includeurl AzurePuml/Networking/AzureVirtualNetwork.puml
+!includeurl AzurePuml/Networking/AzureSubnet.puml
+!includeurl AzurePuml/Networking/AzurePrivateLink.puml
 !includeurl AzurePuml/Containers/AzureContainerApp.puml
 !includeurl AzurePuml/Identity/AzureActiveDirectory.puml
 !includeurl AzurePuml/Storage/AzureBlobStorage.puml
 
 SHOW_PERSON_OUTLINE()
 LAYOUT_WITH_LEGEND()
+LAYOUT_LEFT_RIGHT()
 AddElementTag("v1.0",  $borderColor="red" )
 AddElementTag("storage", $shape=RoundedBoxShape())
 
@@ -20,8 +24,17 @@ Person(user, "User", "Uploads and retrieves documents")
 System_Ext(extapp, "External Application", "Azure-hosted application with a service principal authorized to call the DNStoFD API")
 
 System_Boundary(dnstofd, "DNStoFD"){
-    AzureApplicationGateway(alb, "Azure App Gateway", "Load balancer", "Routes HTTPS traffic to app instances")
-    AzureKubernetesService(app, "DNStoFD API", "Python, Starlette, Uvicorn", "Parses uploaded documents and stores extracted content")
+    AzureVirtualNetwork(vnet, "Virtual Network", "Network Boundary", ""){
+        AzureSubnet(albsubnet, "App GW Subnet", "", ""){
+            AzureApplicationGateway(alb, "Azure App Gateway", "Load balancer", "Routes HTTPS traffic to app instances")
+        }
+        AzureSubnet(akssubnet, "AKS Subnet", "", ""){
+            AzureKubernetesService(app, "DNStoFD API", "Python, Starlette, Uvicorn", "Parses uploaded documents and stores extracted content")
+        }
+        AzureSubnet(pesubnet, "PE Subnet", "", ""){
+            AzurePrivateLink(pe, "Private Endpoint", "Private IP")
+        }
+    }
 }
 
 System_Boundary(azstorage, "Azure Storage") {
@@ -35,11 +48,17 @@ System_Boundary(idp, "Azure Entra ID"){
     AzureActiveDirectory(entra, "Azure Entra ID", "App Registration",  "Issues and validates identity tokens")
 }
 
+Boundary(extnet, "Other Networks (Disallowed)"){
+
+}
+
 Rel(user, alb, "Uploads and retrieves documents via HTTPS")
 Rel(extapp, alb, "Calls document APIs via HTTPS")
 Rel(alb, app, "Routes requests to")
 Rel(app, entra, "Validates bearer tokens using OIDC/JWKS")
-Rel(app, blob, "Stores parsed document content in")
+Rel(pe, blob, "")
+Rel(app, pe, "Stores parsed document content in via Private Endpoint")
+Rel(extnet, blob, "")
 Rel(app, database, "Stores user and document records in")
 
 @enduml

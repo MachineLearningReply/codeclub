@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppSettings(BaseSettings):
-    model_config = SettingsConfigDict(extra="ignore", env_file=".env.azure")
+    model_config = SettingsConfigDict(extra="ignore", env_file=".env.local")
 
     db_connection_string: str
     blob_storage_connection_string: str | None = None
