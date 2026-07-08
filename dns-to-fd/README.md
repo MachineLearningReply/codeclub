@@ -69,12 +69,15 @@ We want to create a small application that parses PDFs and stores its content fo
 
      .
      └── com
-   
+
          └── example.com
-   
+
              ├── www.example.com (CNAME)
+   
              ├── api.example.com (subdomain)
+   
              └── dev.example.com (subdomain)
+   
      - Zone: managed slice of that tree, say, example.com with DNS records:
            example.com        A      93.184.216.34 (IPv4)
            example.com        AAAA   2001:503:83eb::30 (IPv6)
