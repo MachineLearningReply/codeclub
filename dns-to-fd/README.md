@@ -75,17 +75,17 @@ We want to create a small application that parses PDFs and stores its content fo
              └── dev.example.com (subdomain)
      ```
      
-     - Zone: managed slice of that tree, say, example.com with DNS records:
-            ```bash
-            example.com        A      93.184.216.34 (IPv4)
-            example.com        AAAA   2001:503:83eb::30 (IPv6)
-                www.example.com    CNAME  example.com
-                api.example.com    A      10.0.1.20
-                example.com        MX     mail.example.com
-            ```
-        - Nameserver: a server authoritative for the zone (contains records for it)
-        - DNS Primer via `nslookup`: from DNS zone of top-level domain to subdomain zones
-        - Resolution of azure storage and azure postgres flexible servers
+   - Zone: managed slice of that tree, say, example.com with DNS records:
+      ```bash
+      example.com        A      93.184.216.34 (IPv4)
+      example.com        AAAA   2001:503:83eb::30 (IPv6)
+          www.example.com    CNAME  example.com
+          api.example.com    A      10.0.1.20
+          example.com        MX     mail.example.com
+      ```
+   - Nameserver: a server authoritative for the zone (contains records for it)
+   - DNS Primer via `nslookup`: from DNS zone of top-level domain to subdomain zones
+   - Resolution of azure storage and azure postgres flexible servers
 
 2. Extending VNet identity via Service Endpoints (without DNS changes): https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview
     ![C4 container diagram with service endpoints](docs/diagrams/with-service-endpoints/c4container.png)
