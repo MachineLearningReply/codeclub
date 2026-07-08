@@ -43,13 +43,23 @@ We want to create a small application that parses PDFs and stores its content fo
    - az aks get-credentials
    - kubectl ...
 2. Deploy the application within pods
-3. Creating Service Endpoints and restricting public network access
+3. AKS Overview
 
-   ![C4 container diagram with service endpoints](docs/diagrams/with-service-endpoints/c4container.png)
+   - L4 load balancer
 
-4. Creating Private Endpoints and restricting traffic to the network
+     ![AKS with L4 load balancer](docs/diagrams/aks/aks-with-l4.png)
 
-   ![C4 container diagram with private endpoints](docs/diagrams/with-private-endpoints/c4container.png)
+     - Backend Pool points to all the worker nodes
+     - Kube Proxy is aware of Frontend IP to Service IP mapping
+     - Service routes to pods
+   - L7 Ingress: https://gateway-api.sigs.k8s.io/guides/getting-started/introduction/
+
+     ![AKS with L7 ingress](docs/diagrams/aks/aks-with-l7-ingress.png)
+
+   - L7 with App Gateway
+
+     ![AKS with L7 App Gateway](docs/diagrams/aks/aks-with-l7-appgw.png)
+
 
 ## Deep Dives
 
@@ -72,27 +82,13 @@ We want to create a small application that parses PDFs and stores its content fo
    - Nameserver: a server authoritative for the zone (contains records for it)
    - DNS Primer via `nslookup`: from DNS zone of top-level domain to subdomain zones
    - Resolution of azure storage and azure postgres flexible servers
-2. AKS Overview
 
-   - L4 load balancer
-
-     ![AKS with L4 load balancer](docs/diagrams/aks/aks-with-l4.png)
-
-     - Backend Pool points to all the worker nodes
-     - Kube Proxy is aware of Frontend IP to Service IP mapping
-     - Service routes to pods
-   - L7 Ingress: https://gateway-api.sigs.k8s.io/guides/getting-started/introduction/
-
-     ![AKS with L7 ingress](docs/diagrams/aks/aks-with-l7-ingress.png)
-
-   - L7 with App Gateway
-
-     ![AKS with L7 App Gateway](docs/diagrams/aks/aks-with-l7-appgw.png)
-3. App Gateway Overview
-4. Extending VNet identity via Service Endpoints (without DNS changes): https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview
-5. Containing traffic within a VNet using Private Endpoints (renewed DNS resolution)
-6. Process construct (https://linux-kernel-labs.github.io/refs/heads/master/lectures/processes.html)
-7. Lifecycle:
+2. Extending VNet identity via Service Endpoints (without DNS changes): https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview
+    ![C4 container diagram with service endpoints](docs/diagrams/with-service-endpoints/c4container.png)
+3. Containing traffic within a VNet using Private Endpoints (renewed DNS resolution)
+    ![C4 container diagram with private endpoints](docs/diagrams/with-private-endpoints/c4container.png)
+4. Process construct (https://linux-kernel-labs.github.io/refs/heads/master/lectures/processes.html)
+5. Lifecycle:
 
    - DNS packets: strace -e trace=network curl -X GET http://dnstofd.germanywestcentral.cloudapp.azure.com/healthz
    - DNS returns IP: nslookup -query=a http://dnstofd.germanywestcentral.cloudapp.azure.com
