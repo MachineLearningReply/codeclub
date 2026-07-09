@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-to-fd
+  namespace: dnstofd
+  labels:
+    app.kubernetes.io/name: dns-to-fd
+    app.kubernetes.io/part-of: dns-to-fd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dns-to-fd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dns-to-fd
+        app.kubernetes.io/part-of: dns-to-fd
+    spec:
+      containers:
+        - name: dns-to-fd
+          image: dnstofd.azurecr.io/dns-to-fd:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: dnstofd-secrets
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
