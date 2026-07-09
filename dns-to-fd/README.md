@@ -1,8 +1,19 @@
 # A Journey from DNS to File Descriptors - Building, Tracing, and Networking in Production
 
+## Motivation
+In one of our projects that leveraged Asynchronous Distributed Task Processing with Celery, the workers responsible for picking up tasks from the queue were
+opening a socket to open connections to the database at task initialization, which per se sounds fair. However, under extreme load, some tasks were failing and, therefore, becoming stale.
+Consequently, no cleanup code was run and the database connections remained open. At the same time, every task is its own child process and owns its own database sockets, which shot the total number
+of connections to the database server, additionally imposing server-side connection limits. 
+
+This was never caught during development, integration, and even end-to-end testing. This bug was discovered by examining the /proc file system in linux and observing the File
+Descriptor table of the associated processes. 
+
+Having said that, it is imperative that one understands the full lifecycle of a request from the point when the DNS is resolved all the way to when the connections (file descriptors) are open via sockets.
+
 ## Vision
 
-We want to create a small application that parses PDFs and stores its content for quick retrieval via pre-signed URLs. The data needs to be isolated and user ownership must be properly maintained.
+We want to create a small application that parses PDFs and stores its content for quick retrieval via pre-signed URLs. The data needs to be isolated and user ownership must be properly maintained. The application uses entraID for OIDC, and requires an App Registration.
 
 ## Architecture
 
