@@ -9,7 +9,7 @@ of connections to the database server, additionally imposing server-side connect
 This was never caught during development, integration, and even end-to-end testing. This bug was discovered by examining the /proc file system in linux and observing the File
 Descriptor table of the associated processes. 
 
-Having said that, it is imperative that one understands the full lifecycle of a request from the point when the DNS is resolved all the way to when the connections (file descriptors) are open via sockets.
+Having said that, it is imperative that one understands the full lifecycle of a request from the point when the DNS is resolved all the way to when the connections (file descriptors) are opened via sockets.
 
 ## Vision
 
